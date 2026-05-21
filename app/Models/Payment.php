@@ -8,27 +8,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Customer extends Model
+class Payment extends Model
 {
     use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
-        'customer_code', 'name', 'email', 'phone', 'alt_phone',
-        'address_line1', 'barangay', 'city', 'province', 'postal_code',
-        'latitude', 'longitude', 'status', 'tax_id', 'notes',
-        'agent_id', 'activated_at',
+        'payment_number', 'customer_id', 'invoice_id', 'amount_centavos',
+        'gateway', 'gateway_reference', 'received_at', 'status', 'notes',
     ];
 
     protected $casts = [
-        'latitude' => 'decimal:7',
-        'longitude' => 'decimal:7',
-        'activated_at' => 'datetime',
+        'amount_centavos' => 'integer',
+        'received_at' => 'datetime',
     ];
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['status', 'name', 'email', 'phone', 'address_line1', 'city', 'agent_id'])
+            ->logOnly(['status', 'amount_centavos', 'gateway_reference'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }

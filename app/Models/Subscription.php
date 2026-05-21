@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Subscription extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'customer_id', 'service_id', 'router_id', 'status',
@@ -27,10 +29,17 @@ class Subscription extends Model
         'next_billing_date' => 'date',
     ];
 
-    // TODO Phase 2: customer() and service() belongsTo relationships
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['status', 'customer_id', 'service_id', 'router_id', 'username', 'ip_address', 'next_billing_date'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
     public function priceCentavos(): int
     {
         return (int) ($this->price_centavos_override ?? 0);
-        // TODO Phase 2: fall back to $this->service->price_centavos when relationship exists
+        // TODO Phase 3: fall back to $this->service->price_centavos via belongsTo
     }
 }
