@@ -79,6 +79,9 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "audit": {
+            "ignore": ["PKSA-1ds2-yqqr-64g1"]
         }
     },
     "minimum-stability": "stable",
