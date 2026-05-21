@@ -4,9 +4,12 @@ namespace App\Providers;
 
 use App\Services\Network\Contracts\GenieAcsClient;
 use App\Services\Network\Contracts\MikrotikClient;
+use App\Services\Network\Contracts\MikrotikClientFactory;
 use App\Services\Network\Contracts\UispClient;
+use App\Services\Network\Live\LiveMikrotikClientFactory;
 use App\Services\Network\Null\NullGenieAcsClient;
 use App\Services\Network\Null\NullMikrotikClient;
+use App\Services\Network\Null\NullMikrotikClientFactory;
 use App\Services\Network\Null\NullUispClient;
 use Illuminate\Support\ServiceProvider;
 use RuntimeException;
@@ -29,9 +32,16 @@ class NetworkServiceProvider extends ServiceProvider
             };
         });
 
+        // Generic, router-less binding (kept for backward compat with Phase 1 stub usage)
         $this->app->bind(MikrotikClient::class, function () {
+            return new NullMikrotikClient();
+        });
+
+        // Per-router factory ? this is what production code should use
+        $this->app->bind(MikrotikClientFactory::class, function () {
             return match (config('network.mikrotik.driver', 'null')) {
-                'null' => new NullMikrotikClient(),
+                'null' => new NullMikrotikClientFactory(),
+                'live' => new LiveMikrotikClientFactory(),
                 default => throw new RuntimeException('Unknown Mikrotik driver: ' . config('network.mikrotik.driver')),
             };
         });

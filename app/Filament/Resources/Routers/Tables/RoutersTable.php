@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\Routers\Tables;
 
+use Filament\Notifications\Notification;
+use Filament\Actions\Action;
+use App\Services\Network\Contracts\MikrotikClientFactory;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -51,6 +54,21 @@ class RoutersTable
                 //
             ])
             ->recordActions([
+                                Action::make('test_connection')
+                    ->label('Test connection')
+                    ->icon('heroicon-o-signal')
+                    ->color('info')
+                    ->action(function ($record) {
+                        $client = app(MikrotikClientFactory::class)->forRouter($record);
+                        $ok = $client->connect();
+                        $client->disconnect();
+                        $record->update(['last_seen_at' => $ok ? now() : $record->last_seen_at]);
+                        Notification::make()
+                            ->title($ok ? 'Connected ?' : 'Connection failed')
+                            ->body($ok ? "Reached {$record->ip_address}:{$record->api_port}" : "Could not reach {$record->ip_address}:{$record->api_port} ? check IP, port, creds, and that API service is enabled on the router.")
+                            ->{$ok ? 'success' : 'danger'}()
+                            ->send();
+                    }),
                 EditAction::make(),
             ])
             ->toolbarActions([
