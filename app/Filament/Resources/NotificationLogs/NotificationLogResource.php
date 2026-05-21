@@ -16,10 +16,10 @@ use Filament\Tables\Table;
 
 class NotificationLogResource extends Resource
 {
+    protected static \UnitEnum|string|null $navigationGroup = 'System';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-bell';
+
     protected static ?string $model = NotificationLog::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     public static function form(Schema $schema): Schema
     {
         return NotificationLogForm::configure($schema);
