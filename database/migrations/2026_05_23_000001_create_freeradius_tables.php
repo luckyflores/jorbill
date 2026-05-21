@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\DB;
 return new class extends Migration {
     public function up(): void
     {
+        // FreeRADIUS schema uses Postgres-specific types (INET, BIGSERIAL); skip on sqlite (tests use in-memory sqlite)
+        if (DB::getDriverName() !== 'pgsql') return;
         DB::statement("CREATE TABLE IF NOT EXISTS radacct (
             radacctid BIGSERIAL PRIMARY KEY,
             acctsessionid VARCHAR(64) NOT NULL DEFAULT '',
