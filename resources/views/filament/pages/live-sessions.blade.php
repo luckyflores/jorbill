@@ -16,6 +16,7 @@
                     <th class="px-3 py-2 text-right">In (MB)</th>
                     <th class="px-3 py-2 text-right">Out (MB)</th>
                     <th class="px-3 py-2 text-right">Session</th>
+                    <th class="px-3 py-2"></th>
                 </tr>
             </thead>
             <tbody>
@@ -28,11 +29,19 @@
                         <td class="px-3 py-2 text-right">{{ number_format($s->bytes_in_mb, 2) }}</td>
                         <td class="px-3 py-2 text-right">{{ number_format($s->bytes_out_mb, 2) }}</td>
                         <td class="px-3 py-2 text-right font-mono">{{ gmdate('H:i:s', $s->acctsessiontime ?? 0) }}</td>
+                        <td class="px-3 py-2 text-right">
+                            <button
+                                wire:click="kick({{ $s->radacctid }})"
+                                wire:confirm="Disconnect {{ $s->username }} (RADIUS Disconnect-Message)?"
+                                class="text-red-600 hover:text-red-700 text-xs font-medium">
+                                Kick
+                            </button>
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-3 py-8 text-center text-gray-500">
-                            No active sessions yet. Connect a Mikrotik with RADIUS pointing at this server and online users will appear here.
+                        <td colspan="8" class="px-3 py-8 text-center text-gray-500">
+                            No active sessions yet.
                         </td>
                     </tr>
                 @endforelse

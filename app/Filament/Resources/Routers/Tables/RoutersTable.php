@@ -54,7 +54,31 @@ class RoutersTable
                 //
             ])
             ->recordActions([
-                                Action::make('test_connection')
+                                                Action::make('configure_radius')
+                    ->label('Configure RADIUS on device')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalDescription('Pushes /radius add, enables CoA on 3799, sets /ppp aaa to use RADIUS with local fallback. Idempotent.')
+                    ->action(function ($record) {
+                        $client = app(\App\Services\Network\Contracts\MikrotikClientFactory::class)->forRouter($record);
+                        if (! $client->connect()) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Could not connect to router')
+                                ->danger()->send();
+                            return;
+                        }
+                        $ok = $client->configureRadius(
+                            serverIp: parse_url(config('app.url'), PHP_URL_HOST) ?: '127.0.0.1',
+                            sharedSecret: $record->radius_shared_secret ?? '',
+                        );
+                        $client->disconnect();
+                        \Filament\Notifications\Notification::make()
+                            ->title($ok ? 'RADIUS configured on device' : 'Failed to configure RADIUS')
+                            ->{$ok ? 'success' : 'danger'}()
+                            ->send();
+                    }),
+                Action::make('test_connection')
                     ->label('Test connection')
                     ->icon('heroicon-o-signal')
                     ->color('info')

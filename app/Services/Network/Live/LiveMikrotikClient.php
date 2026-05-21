@@ -199,4 +199,53 @@ class LiveMikrotikClient implements MikrotikClient
             return false;
         }
     }
+    public function configureRadius(string $serverIp, string $sharedSecret): bool
+    {
+        if (! $this->client) return false;
+        try {
+            // /radius: idempotent — check existing entries with matching address
+            $existing = $this->client->query(
+                (new Query('/radius/print'))->where('address', $serverIp)
+            )->read();
+
+            if (! empty($existing)) {
+                $this->client->query(
+                    (new Query('/radius/set'))
+                        ->equal('.id', $existing[0]['.id'])
+                        ->equal('secret', $sharedSecret)
+                        ->equal('service', 'ppp,login')
+                        ->equal('timeout', '3s')
+                )->read();
+            } else {
+                $this->client->query(
+                    (new Query('/radius/add'))
+                        ->equal('address', $serverIp)
+                        ->equal('secret', $sharedSecret)
+                        ->equal('service', 'ppp,login')
+                        ->equal('timeout', '3s')
+                )->read();
+            }
+
+            // Enable CoA on port 3799
+            $this->client->query(
+                (new Query('/radius/incoming/set'))
+                    ->equal('accept', 'yes')
+                    ->equal('port', '3799')
+            )->read();
+
+            // /ppp aaa: use RADIUS, fall back to local secrets if RADIUS unreachable
+            $this->client->query(
+                (new Query('/ppp/aaa/set'))
+                    ->equal('use-radius', 'yes')
+                    ->equal('use-radius-only', 'no')
+            )->read();
+
+            Log::info('LiveMikrotikClient::configureRadius success', ['serverIp' => $serverIp]);
+            return true;
+        } catch (Throwable $e) {
+            Log::error('LiveMikrotikClient::configureRadius', ['error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
 }

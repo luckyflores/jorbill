@@ -3,6 +3,8 @@
 namespace App\Filament\Pages;
 
 use App\Models\RadiusSession;
+use App\Services\Network\RadiusManager;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 
 class LiveSessions extends Page
@@ -20,5 +22,20 @@ class LiveSessions extends Page
             ->orderBy('acctstarttime', 'desc')
             ->limit(200)
             ->get();
+    }
+
+    public function kick(int $radacctId): void
+    {
+        $session = RadiusSession::find($radacctId);
+        if (! $session) {
+            Notification::make()->title('Session not found')->danger()->send();
+            return;
+        }
+
+        $ok = app(RadiusManager::class)->kickSession($session);
+        Notification::make()
+            ->title($ok ? 'Disconnect-ACK received' : 'Kick failed (see logs)')
+            ->{$ok ? 'success' : 'danger'}()
+            ->send();
     }
 }

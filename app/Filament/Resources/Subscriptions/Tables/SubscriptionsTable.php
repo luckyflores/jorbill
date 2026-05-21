@@ -40,6 +40,27 @@ class SubscriptionsTable
             ->recordActions([
                 ActionGroup::make([
                     EditAction::make(),
+                                        Action::make('push_bandwidth')
+                        ->label('Push bandwidth (CoA)')
+                        ->icon('heroicon-o-arrow-up-tray')
+                        ->color('info')
+                        ->visible(fn ($record) => $record->status === 'active')
+                        ->requiresConfirmation()
+                        ->modalDescription('Sends RADIUS CoA-Request to the NAS to update Mikrotik-Rate-Limit on this user\'s active session.')
+                        ->action(function ($record) {
+                            $service = \App\Models\Service::find($record->service_id);
+                            if (! $service) {
+                                \Filament\Notifications\Notification::make()->title('Service not found')->danger()->send();
+                                return;
+                            }
+                            $ok = app(\App\Services\Network\RadiusManager::class)->updateBandwidth(
+                                $record, $service->bandwidth_down_kbps, $service->bandwidth_up_kbps,
+                            );
+                            \Filament\Notifications\Notification::make()
+                                ->title($ok ? 'CoA-ACK received (or no active session)' : 'CoA failed (see logs)')
+                                ->{$ok ? 'success' : 'danger'}()
+                                ->send();
+                        }),
                     Action::make('sync')
                         ->label('Sync to router')
                         ->icon('heroicon-o-arrow-path')

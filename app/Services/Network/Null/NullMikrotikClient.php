@@ -69,4 +69,10 @@ class NullMikrotikClient implements MikrotikClient
         Log::info('NullMikrotikClient::removeSimpleQueue', ['name' => $name]);
         return true;
     }
+    public function configureRadius(string $serverIp, string $sharedSecret): bool
+    {
+        Log::info('NullMikrotikClient::configureRadius', compact('serverIp'));
+        return true;
+    }
+
 }

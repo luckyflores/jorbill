@@ -26,4 +26,10 @@ interface MikrotikClient
     public function addSimpleQueue(string $name, string $target, string $maxLimit): bool;
 
     public function removeSimpleQueue(string $name): bool;
+    /**
+     * Idempotently configure this Mikrotik as a RADIUS client of the given server.
+     * Adds /radius entry, enables CoA on port 3799, sets /ppp aaa to use RADIUS with local fallback.
+     */
+    public function configureRadius(string $serverIp, string $sharedSecret): bool;
+
 }
