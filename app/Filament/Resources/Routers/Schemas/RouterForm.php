@@ -39,6 +39,16 @@ class RouterForm
                 DateTimePicker::make('last_seen_at'),
                 Textarea::make('notes')
                     ->columnSpanFull(),
-            ]);
+            
+            \Filament\Forms\Components\TextInput::make('public_ip')
+                ->label('Public IP (what RADIUS sees)')
+                ->maxLength(45),
+            \Filament\Forms\Components\TextInput::make('radius_shared_secret')
+                ->label('RADIUS shared secret')
+                ->password()
+                ->revealable()
+                ->maxLength(60)
+                ->helperText('Set this to register the router as a RADIUS client in the nas table.'),
+        ]);
     }
 }

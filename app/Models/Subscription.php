@@ -21,7 +21,6 @@ class Subscription extends Model
     ];
 
     protected $casts = [
-        'password' => 'encrypted',
         'price_centavos_override' => 'integer',
         'activated_at' => 'datetime',
         'suspended_at' => 'datetime',

@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \App\Models\Router::observe(\App\Observers\RouterObserver::class);
         \App\Models\Subscription::observe(\App\Observers\SubscriptionObserver::class);
         \Illuminate\Support\Facades\Event::listen(
             \App\Events\PaymentRecorded::class,
