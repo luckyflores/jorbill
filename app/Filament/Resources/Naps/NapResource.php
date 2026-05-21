@@ -16,10 +16,10 @@ use Filament\Tables\Table;
 
 class NapResource extends Resource
 {
+    protected static \UnitEnum|string|null $navigationGroup = 'Network';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-cube';
+
     protected static ?string $model = Nap::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     public static function form(Schema $schema): Schema
     {
         return NapForm::configure($schema);

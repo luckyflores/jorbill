@@ -16,10 +16,10 @@ use Filament\Tables\Table;
 
 class LeadResource extends Resource
 {
+    protected static \UnitEnum|string|null $navigationGroup = 'Customers';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-funnel';
+
     protected static ?string $model = Lead::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     public static function form(Schema $schema): Schema
     {
         return LeadForm::configure($schema);

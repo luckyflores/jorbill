@@ -18,10 +18,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AgentResource extends Resource
 {
+    protected static \UnitEnum|string|null $navigationGroup = 'Customers';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-briefcase';
+
     protected static ?string $model = Agent::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     public static function form(Schema $schema): Schema
     {
         return AgentForm::configure($schema);

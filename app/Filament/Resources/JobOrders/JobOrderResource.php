@@ -18,10 +18,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class JobOrderResource extends Resource
 {
+    protected static \UnitEnum|string|null $navigationGroup = 'Operations';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-wrench-screwdriver';
+
     protected static ?string $model = JobOrder::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     public static function form(Schema $schema): Schema
     {
         return JobOrderForm::configure($schema);

@@ -18,10 +18,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ServiceResource extends Resource
 {
+    protected static \UnitEnum|string|null $navigationGroup = 'Catalog';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+
     protected static ?string $model = Service::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     public static function form(Schema $schema): Schema
     {
         return ServiceForm::configure($schema);

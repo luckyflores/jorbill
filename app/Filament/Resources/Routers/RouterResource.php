@@ -16,10 +16,10 @@ use Filament\Tables\Table;
 
 class RouterResource extends Resource
 {
+    protected static \UnitEnum|string|null $navigationGroup = 'Network';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-server';
+
     protected static ?string $model = Router::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     public static function form(Schema $schema): Schema
     {
         return RouterForm::configure($schema);

@@ -18,10 +18,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class SubscriptionResource extends Resource
 {
+    protected static \UnitEnum|string|null $navigationGroup = 'Catalog';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-path-rounded-square';
+
     protected static ?string $model = Subscription::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     public static function form(Schema $schema): Schema
     {
         return SubscriptionForm::configure($schema);

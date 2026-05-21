@@ -18,10 +18,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CustomerResource extends Resource
 {
+    protected static \UnitEnum|string|null $navigationGroup = 'Customers';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
+
     protected static ?string $model = Customer::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     public static function form(Schema $schema): Schema
     {
         return CustomerForm::configure($schema);

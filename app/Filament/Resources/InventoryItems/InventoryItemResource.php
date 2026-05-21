@@ -16,10 +16,10 @@ use Filament\Tables\Table;
 
 class InventoryItemResource extends Resource
 {
+    protected static \UnitEnum|string|null $navigationGroup = 'Operations';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+
     protected static ?string $model = InventoryItem::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     public static function form(Schema $schema): Schema
     {
         return InventoryItemForm::configure($schema);

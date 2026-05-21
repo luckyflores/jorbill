@@ -18,10 +18,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class InvoiceResource extends Resource
 {
+    protected static \UnitEnum|string|null $navigationGroup = 'Billing';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+
     protected static ?string $model = Invoice::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     public static function form(Schema $schema): Schema
     {
         return InvoiceForm::configure($schema);

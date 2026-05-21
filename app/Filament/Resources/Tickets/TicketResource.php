@@ -16,10 +16,10 @@ use Filament\Tables\Table;
 
 class TicketResource extends Resource
 {
+    protected static \UnitEnum|string|null $navigationGroup = 'Operations';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-ticket';
+
     protected static ?string $model = Ticket::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     public static function form(Schema $schema): Schema
     {
         return TicketForm::configure($schema);
