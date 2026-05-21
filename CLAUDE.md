@@ -31,7 +31,7 @@ Competitors and where each one wins:
 
 **Layer 2 — JorBill brain (greenfield, this repo).** The billing/CRM/FSM/automation logic that competitors are weakest at.
 
-- **Laravel 11 + Filament 3** — admin in weeks, not months. Filament eats the CRUD that taoki visibly hand-rolled.
+- **Laravel 13 + Filament 5** — admin in weeks, not months. Filament eats the CRUD that taoki visibly hand-rolled.
 - **Customer portal** — Filament Pages (leaner) or thin Nuxt 3 frontend if we outgrow Filament.
 - **Mobile (customer + tech)** — Flutter, one codebase.
 - **Workers in Go** for Mikrotik API + OLT SNMP/CLI polling. PHP is fine until polling 50+ routers at 30s intervals.
