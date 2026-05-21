@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Services\Tables;
+namespace App\Filament\Resources\Agents\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -12,45 +12,37 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
-class ServicesTable
+class AgentsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
+                TextColumn::make('agent_code')
+                    ->searchable(),
                 TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('slug')
+                TextColumn::make('email')
+                    ->label('Email address')
                     ->searchable(),
-                TextColumn::make('code')
+                TextColumn::make('phone')
                     ->searchable(),
-                TextColumn::make('type')
+                TextColumn::make('commission_type')
                     ->searchable(),
-                TextColumn::make('bandwidth_down_kbps')
+                TextColumn::make('commission_percentage')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('bandwidth_up_kbps')
+                TextColumn::make('commission_flat_centavos')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('price_centavos')
-                    ->label('Price')
-                    ->money('PHP', divideBy: 100)
-                    ->numeric()
-                    ->sortable(),
-                IconColumn::make('vat_inclusive')
-                    ->boolean(),
-                TextColumn::make('billing_cycle')
+                TextColumn::make('bank_name')
                     ->searchable(),
-                TextColumn::make('prepaid_days')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('mikrotik_profile_name')
+                TextColumn::make('bank_account')
+                    ->searchable(),
+                TextColumn::make('gcash_number')
                     ->searchable(),
                 IconColumn::make('is_active')
                     ->boolean(),
-                TextColumn::make('sort_order')
-                    ->numeric()
-                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

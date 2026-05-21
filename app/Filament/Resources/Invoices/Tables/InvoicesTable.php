@@ -34,21 +34,33 @@ class InvoicesTable
                     ->date()
                     ->sortable(),
                 TextColumn::make('subtotal_centavos')
+                    ->label('Subtotal')
+                    ->money('PHP', divideBy: 100)
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('vat_centavos')
+                    ->label('VAT')
+                    ->money('PHP', divideBy: 100)
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('withholding_centavos')
+                    ->label('Withholding')
+                    ->money('PHP', divideBy: 100)
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('discount_centavos')
+                    ->label('Discount')
+                    ->money('PHP', divideBy: 100)
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('total_centavos')
+                    ->label('Total')
+                    ->money('PHP', divideBy: 100)
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('amount_paid_centavos')
+                    ->label('Paid')
+                    ->money('PHP', divideBy: 100)
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('status')

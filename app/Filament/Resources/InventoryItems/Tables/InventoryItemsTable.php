@@ -1,41 +1,41 @@
 <?php
 
-namespace App\Filament\Resources\Payments\Tables;
+namespace App\Filament\Resources\InventoryItems\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
-class PaymentsTable
+class InventoryItemsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('payment_number')
+                TextColumn::make('sku')
+                    ->label('SKU')
                     ->searchable(),
-                TextColumn::make('customer_id')
+                TextColumn::make('name')
+                    ->searchable(),
+                TextColumn::make('category')
+                    ->searchable(),
+                TextColumn::make('serial_number')
+                    ->searchable(),
+                TextColumn::make('quantity')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('invoice_id')
+                TextColumn::make('unit_cost_centavos')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('amount_centavos')
-                    ->label('Amount')
-                    ->money('PHP', divideBy: 100)
+                TextColumn::make('location')
+                    ->searchable(),
+                TextColumn::make('assigned_to')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('gateway')
-                    ->searchable(),
-                TextColumn::make('gateway_reference')
-                    ->searchable(),
-                TextColumn::make('received_at')
-                    ->dateTime()
+                TextColumn::make('subscription_id')
+                    ->numeric()
                     ->sortable(),
                 TextColumn::make('status')
                     ->searchable(),
@@ -47,13 +47,9 @@ class PaymentsTable
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make(),
+                //
             ])
             ->recordActions([
                 EditAction::make(),
@@ -61,8 +57,6 @@ class PaymentsTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
                 ]),
             ]);
     }

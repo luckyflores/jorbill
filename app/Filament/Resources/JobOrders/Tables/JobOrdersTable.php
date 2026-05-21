@@ -1,54 +1,55 @@
 <?php
 
-namespace App\Filament\Resources\Services\Tables;
+namespace App\Filament\Resources\JobOrders\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
-class ServicesTable
+class JobOrdersTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                    ->searchable(),
-                TextColumn::make('slug')
-                    ->searchable(),
-                TextColumn::make('code')
+                TextColumn::make('job_number')
                     ->searchable(),
                 TextColumn::make('type')
                     ->searchable(),
-                TextColumn::make('bandwidth_down_kbps')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('bandwidth_up_kbps')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('price_centavos')
-                    ->label('Price')
-                    ->money('PHP', divideBy: 100)
-                    ->numeric()
-                    ->sortable(),
-                IconColumn::make('vat_inclusive')
-                    ->boolean(),
-                TextColumn::make('billing_cycle')
+                TextColumn::make('status')
                     ->searchable(),
-                TextColumn::make('prepaid_days')
+                TextColumn::make('priority')
+                    ->searchable(),
+                TextColumn::make('customer_id')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('mikrotik_profile_name')
-                    ->searchable(),
-                IconColumn::make('is_active')
-                    ->boolean(),
-                TextColumn::make('sort_order')
+                TextColumn::make('lead_id')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('subscription_id')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('assigned_to')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('scheduled_at')
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('started_at')
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('completed_at')
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('location_lat')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('location_lng')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
