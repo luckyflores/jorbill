@@ -5,4 +5,5 @@ return [
     App\Providers\Filament\AdminPanelProvider::class,
     App\Providers\NetworkServiceProvider::class,
     App\Providers\PaymentServiceProvider::class,
+    App\Providers\NotificationServiceProvider::class,
 ];
