@@ -12,6 +12,8 @@ class NotificationLog extends Model
     protected $fillable = [
         'channel', 'driver', 'to', 'subject', 'body', 'event',
         'customer_id', 'status', 'gateway_reference', 'error', 'sent_at',
+        'delivered_at', 'provider_status', 'provider_error_code',
+        'delivered_at', 'provider_status', 'provider_error_code',
     ];
-    protected $casts = ['sent_at' => 'datetime'];
+    protected $casts = ['sent_at' => 'datetime', 'delivered_at' => 'datetime'];
 }
