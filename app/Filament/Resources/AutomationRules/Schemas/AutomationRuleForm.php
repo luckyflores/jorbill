@@ -148,7 +148,8 @@ class AutomationRuleForm
                         ->required()
                         ->schema([
                             Select::make('type')->required()->live()->options([
-                                'send_sms'         => 'Send SMS',
+                                'send_sms'         => 'Send SMS (inline body)',
+                                'send_template'    => 'Send template (recommended)',
                                 'update_field'     => 'Update a field',
                                 'create_job_order' => 'Create a Job Order',
                                 'log_activity'     => 'Log an activity entry',
@@ -156,8 +157,37 @@ class AutomationRuleForm
 
                             TextInput::make('to')->label('To')->default('{{customer.phone}}')
                                 ->visible(fn ($get) => $get('type') === 'send_sms')->columnSpan(2),
+                            Select::make('channel')
+                                ->label('Channel (optional override)')
+                                ->visible(fn ($get) => $get('type') === 'send_sms')
+                                ->options(fn () => app(\App\Services\Notifications\NotifierRegistry::class)->options())
+                                ->placeholder('Use default (' . config('notifications.default', 'log') . ')')
+                                ->columnSpan(2)
+                                ->native(false),
                             Textarea::make('body')->label('SMS body')
                                 ->visible(fn ($get) => $get('type') === 'send_sms')->columnSpanFull(),
+
+                            // ──── send_template fields ────
+                            Select::make('template')
+                                ->label('Template')
+                                ->visible(fn ($get) => $get('type') === 'send_template')
+                                ->options(fn () => \App\Models\NotificationTemplate::where('is_active', true)->pluck('label', 'name')->toArray())
+                                ->searchable()
+                                ->required(fn ($get) => $get('type') === 'send_template')
+                                ->columnSpan(2)
+                                ->native(false),
+                            TextInput::make('to')
+                                ->label('To (optional override)')
+                                ->visible(fn ($get) => $get('type') === 'send_template')
+                                ->placeholder('{{customer.phone}}')
+                                ->columnSpan(2),
+                            \Filament\Forms\Components\CheckboxList::make('channels')
+                                ->label('Send via channel(s)')
+                                ->visible(fn ($get) => $get('type') === 'send_template')
+                                ->options(fn () => app(\App\Services\Notifications\NotifierRegistry::class)->options())
+                                ->columns(3)
+                                ->helperText('Check one or more. Empty = use the template default channel.')
+                                ->columnSpanFull(),
 
                             TextInput::make('target')->label('Target field')->placeholder('subscription.status')
                                 ->visible(fn ($get) => $get('type') === 'update_field')->columnSpan(2),
