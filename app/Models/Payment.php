@@ -14,12 +14,15 @@ class Payment extends Model
 
     protected $fillable = [
         'payment_number', 'customer_id', 'invoice_id', 'amount_centavos',
-        'gateway', 'gateway_reference', 'received_at', 'status', 'notes',
+        'gateway', 'gateway_reference', 'received_at',
+        'reverses_payment_id', 'reversed_at', 'reversed_reason', 'status', 'notes',
     ];
 
     protected $casts = [
         'amount_centavos' => 'integer',
         'received_at' => 'datetime',
+        'reversed_at' => 'datetime',
+        'reverses_payment_id' => 'integer',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -32,5 +35,11 @@ class Payment extends Model
 
     public function customer() { return $this->belongsTo(Customer::class); }
     public function invoice()  { return $this->belongsTo(Invoice::class); }
+
+
+    public function reversedBy()  { return $this->hasOne(Payment::class, 'reverses_payment_id'); }
+    public function originalPayment() { return $this->belongsTo(Payment::class, 'reverses_payment_id'); }
+    public function isReversed(): bool { return $this->status === 'reversed'; }
+    public function isReversal(): bool { return $this->status === 'reversal'; }
 
 }
