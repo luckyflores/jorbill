@@ -21,4 +21,9 @@ class Nap extends Model
         'capacity' => 'integer',
         'ports_used' => 'integer',
     ];
+
+    public function parentNap() { return $this->belongsTo(Nap::class, 'parent_nap_id'); }
+    public function children()  { return $this->hasMany(Nap::class, 'parent_nap_id'); }
+    public function onus()      { return $this->hasMany(Onu::class); }
+
 }

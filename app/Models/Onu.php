@@ -23,4 +23,8 @@ class Onu extends Model
         'installed_at' => 'datetime',
         'last_seen_at' => 'datetime',
     ];
+
+    public function subscription() { return $this->belongsTo(Subscription::class); }
+    public function nap()          { return $this->belongsTo(Nap::class); }
+
 }

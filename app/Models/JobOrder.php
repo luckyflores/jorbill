@@ -35,4 +35,7 @@ class JobOrder extends Model
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
+
+    public function customer() { return $this->belongsTo(Customer::class); }
+
 }

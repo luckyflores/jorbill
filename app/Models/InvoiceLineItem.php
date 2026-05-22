@@ -20,4 +20,9 @@ class InvoiceLineItem extends Model
         'unit_price_centavos' => 'integer',
         'amount_centavos' => 'integer',
     ];
+
+    public function invoice()      { return $this->belongsTo(Invoice::class); }
+    public function subscription() { return $this->belongsTo(Subscription::class); }
+    public function service()      { return $this->belongsTo(Service::class); }
+
 }

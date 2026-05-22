@@ -29,4 +29,8 @@ class Payment extends Model
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
+
+    public function customer() { return $this->belongsTo(Customer::class); }
+    public function invoice()  { return $this->belongsTo(Invoice::class); }
+
 }

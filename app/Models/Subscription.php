@@ -41,4 +41,9 @@ class Subscription extends Model
         return (int) ($this->price_centavos_override ?? 0);
         // TODO Phase 3: fall back to $this->service->price_centavos via belongsTo
     }
+
+    public function customer()   { return $this->belongsTo(Customer::class); }
+    public function service()    { return $this->belongsTo(Service::class); }
+    public function router()     { return $this->belongsTo(Router::class); }
+
 }
