@@ -19,4 +19,7 @@ interface GenieAcsClient
     public function pushFirmware(string $deviceId, string $firmwareUrl): bool;
 
     public function getInformedAt(string $deviceId): ?DateTimeInterface;
+    /** Find a device by its TR-069 SerialNumber. Returns full device or null. */
+    public function findDeviceBySerial(string $serialNumber): ?array;
+
 }

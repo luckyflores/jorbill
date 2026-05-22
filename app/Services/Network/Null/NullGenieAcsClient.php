@@ -50,4 +50,10 @@ class NullGenieAcsClient implements GenieAcsClient
         Log::info('NullGenieAcsClient::getInformedAt', ['deviceId' => $deviceId]);
         return null;
     }
+    public function findDeviceBySerial(string $serialNumber): ?array
+    {
+        Log::info('NullGenieAcsClient::findDeviceBySerial', ['serial' => $serialNumber]);
+        return null;
+    }
+
 }

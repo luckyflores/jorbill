@@ -6,6 +6,7 @@ use App\Services\Network\Contracts\GenieAcsClient;
 use App\Services\Network\Contracts\MikrotikClient;
 use App\Services\Network\Contracts\MikrotikClientFactory;
 use App\Services\Network\Contracts\UispClient;
+use App\Services\Network\Live\LiveGenieAcsClient;
 use App\Services\Network\Live\LiveMikrotikClientFactory;
 use App\Services\Network\Null\NullGenieAcsClient;
 use App\Services\Network\Null\NullMikrotikClient;
@@ -28,6 +29,11 @@ class NetworkServiceProvider extends ServiceProvider
         $this->app->bind(GenieAcsClient::class, function () {
             return match (config('network.genieacs.driver', 'null')) {
                 'null' => new NullGenieAcsClient(),
+                'live' => new LiveGenieAcsClient(
+                    baseUrl: config('network.genieacs.base_url') ?? 'http://127.0.0.1:7557',
+                    username: config('network.genieacs.username'),
+                    password: config('network.genieacs.password'),
+                ),
                 default => throw new RuntimeException('Unknown GenieACS driver: ' . config('network.genieacs.driver')),
             };
         });
