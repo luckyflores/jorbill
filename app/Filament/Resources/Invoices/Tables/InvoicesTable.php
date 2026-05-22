@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Invoices\Tables;
 
+use App\Services\Payment\Contracts\PaymentGateway;
+
 use Filament\Notifications\Notification;
 
 use Filament\Actions\Action;
@@ -143,6 +145,57 @@ class InvoicesTable
                             Notification::make()->title('Pushed to Odoo')->body('Odoo invoice id: ' . $odooId)->success()->send();
                         } else {
                             Notification::make()->title('Push failed')->body('Check Odoo logs.')->danger()->send();
+                        }
+                    }),
+                                Action::make('send_payment_link')
+                    ->label('Send payment link')
+                    ->icon('heroicon-o-link')
+                    ->color('success')
+                    ->visible(fn ($record) => in_array($record->status, ['issued', 'overdue'], true))
+                    ->requiresConfirmation()
+                    ->modalDescription('Creates a HitPay payment-request and shows you the checkout URL. The customer pays on HitPay; their webhook calls back here and the Payment row is created automatically.')
+                    ->action(function ($record) {
+                        $gateway = app(PaymentGateway::class);
+                        if ($gateway->id() !== 'hitpay') {
+                            \Filament\Notifications\Notification::make()
+                                ->title('PAYMENT_GATEWAY env is not "hitpay"')
+                                ->body('Set PAYMENT_GATEWAY=hitpay + HITPAY_API_KEY + HITPAY_SALT in .env, then restart the app.')
+                                ->warning()->send();
+                            return;
+                        }
+
+                        $customer = \App\Models\Customer::find($record->customer_id);
+                        $amountDue = $record->total_centavos - ($record->amount_paid_centavos ?? 0);
+                        if ($amountDue <= 0) {
+                            \Filament\Notifications\Notification::make()->title('Invoice already paid')->warning()->send();
+                            return;
+                        }
+
+                        try {
+                            $result = $gateway->createCheckout(
+                                amountCentavos: $amountDue,
+                                invoiceNumber: $record->invoice_number,
+                                customer: [
+                                    'name'  => $customer?->name,
+                                    'email' => $customer?->email,
+                                    'phone' => $customer?->phone,
+                                ],
+                                callbackUrl: (string) config('payment.gateways.hitpay.redirect_url'),
+                            );
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('Payment link ready')
+                                ->body('Send this URL to the customer: ' . $result['checkout_url'])
+                                ->success()
+                                ->persistent()
+                                ->send();
+                        } catch (\Throwable $e) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Could not create payment link')
+                                ->body($e->getMessage())
+                                ->danger()
+                                ->persistent()
+                                ->send();
                         }
                     }),
                 EditAction::make(),

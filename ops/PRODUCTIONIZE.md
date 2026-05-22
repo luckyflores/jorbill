@@ -47,3 +47,26 @@ Custom community modules installed at `/opt/odoo-addons/` (owned by `odoo:odoo`)
 4. Refresh apps list: `sudo -u odoo /usr/bin/odoo -d jorbill_accounting --update=base --no-http --stop-after-init`
 5. Start Odoo: `sudo systemctl start odoo`
 6. In Odoo UI (dev mode): Apps → Update Apps List → reinstall/upgrade
+
+
+## Phase 18 — operations hardening
+
+### systemd unit for JorBill
+- Unit file: `/etc/systemd/system/jorbill.service`
+- Replaces `nohup php artisan serve` — now restarts on failure, survives VM reboot.
+- `sudo systemctl {status|restart|stop} jorbill`
+- Logs: `sudo journalctl -u jorbill -f`
+
+### Business Settings
+- DB-backed `settings` table, `Setting::get()` / `Setting::put()` helpers (5-min cache).
+- Filament page **System → Business Settings** for company name, TIN, address, VAT toggle + rate, currency.
+- VAT toggle: when OFF, future invoices skip the 12% breakout.
+
+### HitPay payment gateway
+- `HitpayGateway implements PaymentGateway` (`app/Services/Payment/Hitpay/`).
+- Webhook URL: `https://jorbill.maltixtech.xyz/webhooks/hitpay` (CSRF exempt via `webhooks/*` rule).
+- HMAC-SHA256 validation on every incoming callback; rejects unsigned/forged payloads.
+- Idempotent — duplicate `gateway_reference` lookups prevent double-recording on webhook retries.
+- Sandbox vs live: `HITPAY_USE_LIVE` env flag toggles `api.hit-pay.com` vs `api.sandbox.hit-pay.com`.
+- Filament Invoice "Send payment link" action — generates HitPay checkout URL, persistent notification you can copy + send to the customer.
+- `.env` keys (gitignored): `HITPAY_API_KEY`, `HITPAY_SALT`, `HITPAY_USE_LIVE`, `HITPAY_CURRENCY`.
