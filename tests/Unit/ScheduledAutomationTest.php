@@ -122,10 +122,10 @@ class ScheduledAutomationTest extends TestCase
             'actions' => [['type' => 'log_activity', 'description' => 'fired']],
         ]);
 
-        $countBefore = $rule->fire_count;
+        $countBefore = (int) ($rule->fire_count ?? 0);
         app(AutomationEngine::class)->fireScheduledRule($rule, dryRun: true);
         $rule->refresh();
-        $this->assertSame($countBefore, $rule->fire_count);  // dry-run does NOT bump fire_count
+        $this->assertSame($countBefore, (int) $rule->fire_count);  // dry-run does NOT bump fire_count
         // execution log row IS created (so user can review what would happen)
         $this->assertSame(1, AutomationRuleExecution::where('rule_id', $rule->id)->count());
     }
