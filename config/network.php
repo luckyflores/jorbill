@@ -12,6 +12,10 @@ return [
         'username' => env('GENIEACS_USERNAME'),
         'password' => env('GENIEACS_PASSWORD'),
     ],
+    'olt' => [
+        'driver' => env('OLT_DRIVER', 'null'),
+    ],
+
     'mikrotik' => [
         'driver' => env('MIKROTIK_DRIVER', 'null'),
     ],

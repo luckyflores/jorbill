@@ -7,7 +7,10 @@ use App\Services\Network\Contracts\MikrotikClient;
 use App\Services\Network\Contracts\MikrotikClientFactory;
 use App\Services\Network\Contracts\UispClient;
 use App\Services\Network\Live\LiveGenieAcsClient;
+use App\Services\Network\Contracts\OltClientFactory;
 use App\Services\Network\Live\LiveMikrotikClientFactory;
+use App\Services\Network\Live\LiveOltClientFactory;
+use App\Services\Network\Null\NullOltClientFactory;
 use App\Services\Network\Null\NullGenieAcsClient;
 use App\Services\Network\Null\NullMikrotikClient;
 use App\Services\Network\Null\NullMikrotikClientFactory;
@@ -44,6 +47,15 @@ class NetworkServiceProvider extends ServiceProvider
         });
 
         // Per-router factory ? this is what production code should use
+        
+        $this->app->bind(OltClientFactory::class, function () {
+            return match (config('network.olt.driver', 'null')) {
+                'null' => new NullOltClientFactory(),
+                'live' => new LiveOltClientFactory(),
+                default => throw new RuntimeException('Unknown OLT driver: ' . config('network.olt.driver')),
+            };
+        });
+
         $this->app->bind(MikrotikClientFactory::class, function () {
             return match (config('network.mikrotik.driver', 'null')) {
                 'null' => new NullMikrotikClientFactory(),
