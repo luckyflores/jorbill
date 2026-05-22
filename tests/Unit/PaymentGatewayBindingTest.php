@@ -10,6 +10,10 @@ class PaymentGatewayBindingTest extends TestCase
 {
     public function test_payment_gateway_resolves_to_null_by_default(): void
     {
+        // Force null driver regardless of .env on the dev box
+        config(['payment.default' => 'null']);
+        $this->app->forgetInstance(\App\Services\Payment\Contracts\PaymentGateway::class);
+
         $this->assertInstanceOf(NullPaymentGateway::class, app(PaymentGateway::class));
         $this->assertSame('null', app(PaymentGateway::class)->id());
     }
