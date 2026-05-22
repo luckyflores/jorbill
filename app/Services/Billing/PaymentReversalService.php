@@ -78,8 +78,11 @@ class PaymentReversalService
         if (! $invoice) return;
 
         // Sum: completed payments + reversal payments (negative). Skip 'reversed' (the original got offset).
+        // Only 'completed' counts toward paid; 'reversed' (original) and 'reversal' (offset)
+        // are both excluded — the cancellation has already been accounted for by excluding the
+        // reversed original. Counting the reversal too would double-decrement.
         $paid = (int) Payment::where('invoice_id', $invoiceId)
-            ->whereIn('status', ['completed', 'reversal'])
+            ->where('status', 'completed')
             ->sum('amount_centavos');
 
         $paid = max(0, $paid);
