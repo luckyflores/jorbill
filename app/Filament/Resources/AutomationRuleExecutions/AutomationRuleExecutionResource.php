@@ -43,7 +43,6 @@ class AutomationRuleExecutionResource extends Resource
     {
         return [
             'index' => ListAutomationRuleExecutions::route('/'),
-            'create' => CreateAutomationRuleExecution::route('/create'),
             'edit' => EditAutomationRuleExecution::route('/{record}/edit'),
         ];
     }
