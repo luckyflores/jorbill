@@ -87,6 +87,7 @@ class CustomersTable
                         $odoo = app(OdooClient::class);
                         $id = $odoo->findOrCreatePartner($record->toArray());
                         if ($id !== null) {
+                            $record->forceFill(['odoo_id' => $id, 'odoo_synced_at' => now()])->save();
                             Notification::make()
                                 ->title('Pushed to Odoo')
                                 ->body('Odoo partner id: ' . $id)

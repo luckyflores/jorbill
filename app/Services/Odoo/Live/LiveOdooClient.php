@@ -170,4 +170,66 @@ class LiveOdooClient implements OdooClient
         ]);
         return is_array($rows) ? $rows : [];
     }
+
+    public function pushInvoice(array $invoice, array $lineItems, int $partnerId): ?int
+    {
+        $lines = [];
+        foreach ($lineItems as $line) {
+            $lines[] = [0, 0, [
+                'name'       => (string) ($line['description'] ?? 'Service'),
+                'quantity'   => (float) ($line['quantity'] ?? 1),
+                'price_unit' => (int) ($line['unit_price_centavos'] ?? 0) / 100,
+            ]];
+        }
+
+        $vals = [
+            'partner_id'       => $partnerId,
+            'move_type'        => 'out_invoice',
+            'invoice_date'     => $this->dateOnly($invoice['issued_at'] ?? null),
+            'invoice_date_due' => $this->dateOnly($invoice['due_at']    ?? null),
+            'ref'              => (string) ($invoice['invoice_number'] ?? ''),
+            'invoice_line_ids' => $lines,
+        ];
+
+        $id = $this->callKw('account.move', 'create', [$vals]);
+        if (! $id) return null;
+        // post the invoice (draft → posted)
+        $this->callKw('account.move', 'action_post', [[(int) $id]]);
+        return (int) $id;
+    }
+
+    public function pushPayment(array $payment, int $partnerId): ?int
+    {
+        $amount = (int) ($payment['amount_centavos'] ?? 0);
+        $vals = [
+            'partner_id'   => $partnerId,
+            'amount'       => abs($amount) / 100,
+            'payment_type' => $amount >= 0 ? 'inbound' : 'outbound',
+            'partner_type' => 'customer',
+            'date'         => $this->dateOnly($payment['received_at'] ?? null),
+            'ref'          => (string) ($payment['payment_number'] ?? ''),
+            'memo'         => (string) ($payment['payment_number'] ?? ''),
+        ];
+        $id = $this->callKw('account.payment', 'create', [$vals]);
+        if (! $id) return null;
+        $this->callKw('account.payment', 'action_post', [[(int) $id]]);
+        return (int) $id;
+    }
+
+    public function cancelPayment(int $odooPaymentId): bool
+    {
+        $r = $this->callKw('account.payment', 'action_cancel', [[$odooPaymentId]]);
+        return $r !== null;
+    }
+
+    private function dateOnly(mixed $value): ?string
+    {
+        if (! $value) return null;
+        try {
+            return \Illuminate\Support\Carbon::parse($value)->format('Y-m-d');
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
 }

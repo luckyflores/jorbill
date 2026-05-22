@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\DB;
 
 class PaymentReversalService
 {
+    public function __construct(
+        private readonly \App\Services\Odoo\Contracts\OdooClient $odoo,
+    ) {}
+
     /**
      * Atomically reverse a payment:
      *  1. Create offsetting Payment (negative amount, status=reversal, links to original)
@@ -52,6 +56,17 @@ class PaymentReversalService
             // 3. Recompute the invoice from scratch
             if ($original->invoice_id) {
                 $this->recomputeInvoice($original->invoice_id);
+            }
+
+            // 3.5 If the original was pushed to Odoo, cancel it there too
+            if ($original->odoo_id) {
+                try {
+                    $this->odoo->cancelPayment((int) $original->odoo_id);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning('PaymentReversalService: Odoo cancelPayment failed', [
+                        'odoo_id' => $original->odoo_id, 'error' => $e->getMessage(),
+                    ]);
+                }
             }
 
             // 4. Audit log

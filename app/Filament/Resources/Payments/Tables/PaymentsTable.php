@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\Payments\Tables;
 
+use App\Models\Customer;
+
+use App\Services\Odoo\Contracts\OdooClient;
+
 use Filament\Notifications\Notification;
 
 use Filament\Forms\Components\Textarea;
@@ -65,7 +69,40 @@ class PaymentsTable
             ->filters([
                 TrashedFilter::make(),
             ])
-            ->recordActions([
+            ->recordActions([                Action::make('push_payment_to_odoo')
+                    ->label('Push to Odoo')
+                    ->icon('heroicon-o-cloud-arrow-up')
+                    ->color('info')
+                    ->visible(fn ($record) => ! $record->odoo_id && in_array($record->status, ['completed', 'reversal'], true))
+                    ->requiresConfirmation()
+                    ->modalDescription('Creates the matching account.payment in Odoo + posts it. Pushes the customer first if needed. Idempotent.')
+                    ->action(function ($record) {
+                        $odoo = app(OdooClient::class);
+
+                        $customer = Customer::find($record->customer_id);
+                        if (! $customer) {
+                            Notification::make()->title('Push failed: customer missing')->danger()->send();
+                            return;
+                        }
+                        $partnerId = $customer->odoo_id;
+                        if (! $partnerId) {
+                            $partnerId = $odoo->findOrCreatePartner($customer->toArray());
+                            if (! $partnerId) {
+                                Notification::make()->title('Could not create Odoo partner')->danger()->send();
+                                return;
+                            }
+                            $customer->forceFill(['odoo_id' => $partnerId, 'odoo_synced_at' => now()])->save();
+                        }
+
+                        $odooId = $odoo->pushPayment($record->toArray(), $partnerId);
+                        if ($odooId !== null) {
+                            $record->forceFill(['odoo_id' => $odooId, 'odoo_synced_at' => now()])->save();
+                            Notification::make()->title('Pushed to Odoo')->body('Odoo payment id: ' . $odooId)->success()->send();
+                        } else {
+                            Notification::make()->title('Push failed')->body('Check Odoo logs.')->danger()->send();
+                        }
+                    }),
+                
                                 Action::make('reverse_payment')
                     ->label('Reverse payment')
                     ->icon('heroicon-o-arrow-uturn-left')

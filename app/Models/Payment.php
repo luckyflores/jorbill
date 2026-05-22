@@ -13,12 +13,15 @@ class Payment extends Model
     use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
+        'odoo_id', 'odoo_synced_at',
         'payment_number', 'customer_id', 'invoice_id', 'amount_centavos',
         'gateway', 'gateway_reference', 'received_at',
         'reverses_payment_id', 'reversed_at', 'reversed_reason', 'status', 'notes',
     ];
 
     protected $casts = [
+        'odoo_id' => 'integer',
+        'odoo_synced_at' => 'datetime',
         'amount_centavos' => 'integer',
         'received_at' => 'datetime',
         'reversed_at' => 'datetime',

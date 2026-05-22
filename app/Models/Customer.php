@@ -13,6 +13,7 @@ class Customer extends Model
     use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
+        'odoo_id', 'odoo_synced_at',
         'customer_code', 'name', 'email', 'phone', 'alt_phone',
         'address_line1', 'barangay', 'city', 'province', 'postal_code',
         'latitude', 'longitude', 'status', 'tax_id', 'notes',
@@ -20,6 +21,8 @@ class Customer extends Model
     ];
 
     protected $casts = [
+        'odoo_id' => 'integer',
+        'odoo_synced_at' => 'datetime',
         'latitude' => 'decimal:7',
         'longitude' => 'decimal:7',
         'activated_at' => 'datetime',

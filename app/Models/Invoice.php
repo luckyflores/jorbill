@@ -13,6 +13,7 @@ class Invoice extends Model
     use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
+        'odoo_id', 'odoo_synced_at',
         'invoice_number', 'series_code', 'customer_id', 'subscription_id',
         'issued_at', 'due_at',
         'subtotal_centavos', 'vat_centavos', 'withholding_centavos',
@@ -21,6 +22,8 @@ class Invoice extends Model
     ];
 
     protected $casts = [
+        'odoo_id' => 'integer',
+        'odoo_synced_at' => 'datetime',
         'issued_at' => 'date',
         'due_at' => 'date',
         'subtotal_centavos' => 'integer',
