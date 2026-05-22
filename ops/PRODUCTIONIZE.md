@@ -28,3 +28,22 @@
 - Operator:   https://jorbill.maltixtech.xyz/admin
 - Accountant: https://accounting.maltixtech.xyz/web/login
 - ssh:        ssh jorbill (port 22, public IP)
+
+
+## Odoo custom addons (Phase 17B)
+
+Custom community modules installed at `/opt/odoo-addons/` (owned by `odoo:odoo`):
+
+- **base_accounting_kit** (Cybrosys) — Balance Sheet, P&L, Cash Flow, Trial Balance, General Ledger, Aged Partner Balance, asset management, budget, recurring entries, bank reconciliation. Fills the Enterprise-only accounting reports gap.
+- **dynamic_accounts_report** (Cybrosys) — Interactive drill-down financial reports with PDF/XLSX export. Complements `base_accounting_kit`.
+
+`addons_path` in `/etc/odoo/odoo.conf` includes `/opt/odoo-addons` so Odoo discovers these on startup.
+
+### To upgrade / change modules
+
+1. Stop Odoo: `sudo systemctl stop odoo`
+2. Replace folder(s) under `/opt/odoo-addons/`
+3. `sudo chown -R odoo:odoo /opt/odoo-addons`
+4. Refresh apps list: `sudo -u odoo /usr/bin/odoo -d jorbill_accounting --update=base --no-http --stop-after-init`
+5. Start Odoo: `sudo systemctl start odoo`
+6. In Odoo UI (dev mode): Apps → Update Apps List → reinstall/upgrade
