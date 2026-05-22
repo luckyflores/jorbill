@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (app()->environment('production') || str_starts_with(config('app.url'), 'https://')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
         \App\Models\Router::observe(\App\Observers\RouterObserver::class);
         \App\Models\Subscription::observe(\App\Observers\SubscriptionObserver::class);
         \Illuminate\Support\Facades\Event::listen(
