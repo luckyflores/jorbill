@@ -140,21 +140,28 @@ class AutomationEngine
             $value = $cond['value']    ?? null;
             if (! $field) continue;
 
-            // Computed-field translations to SQL
+            // Computed-field translations — driver-aware (postgres in prod, sqlite in tests)
+            $driver = $query->getModel()->getConnection()->getDriverName();
+            $dayDiff = fn (string $col) => $driver === 'sqlite'
+                ? "CAST((julianday(CURRENT_DATE) - julianday({$col})) AS INTEGER)"
+                : "(CURRENT_DATE - {$col}::date)";
+
             if ($field === 'days_overdue' && in_array($op, ['gt','lt','eq','ne'], true)) {
-                $expr = "(CURRENT_DATE - due_at::date)";
+                $expr = $dayDiff('due_at');
                 $sqlOp = match ($op) { 'gt'=>'>', 'lt'=>'<', 'eq'=>'=', 'ne'=>'!=' };
                 $query->whereRaw("{$expr} {$sqlOp} ?", [(int) $value]);
                 continue;
             }
             if ($field === 'days_until_due' && in_array($op, ['gt','lt','eq','ne'], true)) {
-                $expr = "(due_at::date - CURRENT_DATE)";
+                $expr = $driver === 'sqlite'
+                    ? "CAST((julianday(due_at) - julianday(CURRENT_DATE)) AS INTEGER)"
+                    : "(due_at::date - CURRENT_DATE)";
                 $sqlOp = match ($op) { 'gt'=>'>', 'lt'=>'<', 'eq'=>'=', 'ne'=>'!=' };
                 $query->whereRaw("{$expr} {$sqlOp} ?", [(int) $value]);
                 continue;
             }
             if ($field === 'days_since_activated' && in_array($op, ['gt','lt','eq','ne'], true)) {
-                $expr = "(CURRENT_DATE - activated_at::date)";
+                $expr = $dayDiff('activated_at');
                 $sqlOp = match ($op) { 'gt'=>'>', 'lt'=>'<', 'eq'=>'=', 'ne'=>'!=' };
                 $query->whereRaw("{$expr} {$sqlOp} ?", [(int) $value]);
                 continue;
