@@ -68,7 +68,8 @@ class OdooPushTest extends TestCase
             $body = json_decode($req->body(), true);
             if (! isset($body['params']['method']) || $body['params']['method'] !== 'create') return false;
             $vals = $body['params']['args'][0];
-            return $vals['payment_type'] === 'outbound' && $vals['amount'] === 999.0;
+            // loose compare — PHP's / on whole numbers returns int, JSON has no int/float distinction
+            return $vals['payment_type'] === 'outbound' && $vals['amount'] == 999;
         });
     }
 
