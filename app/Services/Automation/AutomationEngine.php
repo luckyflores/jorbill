@@ -82,10 +82,18 @@ class AutomationEngine
         $h = (int) ($parts[0] ?? 0);
         $m = (int) ($parts[1] ?? 0);
 
+        // Pass day_of_month / day_of_week as STRINGS so cron's native comma (5,20),
+        // range (5-10), and step (*/7) syntax all work.
+        $dom = trim((string) ($config['day_of_month'] ?? '1'));
+        $dow = trim((string) ($config['day_of_week']  ?? '1'));
+        // sanity: reject anything but digits + cron metachars
+        if (! preg_match('/^[0-9,\-\/\*]+$/', $dom)) $dom = '1';
+        if (! preg_match('/^[0-9,\-\/\*]+$/', $dow)) $dow = '1';
+
         return match ($config['schedule_type'] ?? 'daily') {
             'daily'   => "{$m} {$h} * * *",
-            'weekly'  => "{$m} {$h} * * " . ((int) ($config['day_of_week'] ?? 1)),
-            'monthly' => "{$m} {$h} " . ((int) ($config['day_of_month'] ?? 1)) . " * *",
+            'weekly'  => "{$m} {$h} * * {$dow}",
+            'monthly' => "{$m} {$h} {$dom} * *",
             'cron'    => $config['cron'] ?? '* * * * *',
             default   => '* * * * *',
         };

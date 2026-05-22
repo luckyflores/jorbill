@@ -16,6 +16,8 @@ use Filament\Tables\Table;
 
 class AutomationRuleExecutionResource extends Resource
 {
+    public static function canCreate(): bool { return false; }
+
     protected static \UnitEnum|string|null $navigationGroup = 'Automation';
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 

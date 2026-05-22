@@ -77,18 +77,19 @@ class AutomationRuleForm
                         ->seconds(false)
                         ->default('08:00'),
                     TextInput::make('trigger_config.day_of_month')
-                        ->label('Day of month')
+                        ->label('Day(s) of month')
                         ->visible(fn ($get) => $get('trigger_config.schedule_type') === 'monthly')
-                        ->numeric()
-                        ->minValue(1)->maxValue(31)
-                        ->default(5)
-                        ->helperText('1-31. Months without that day will skip.'),
-                    Select::make('trigger_config.day_of_week')
-                        ->label('Day of week')
+                        ->default('5')
+                        ->placeholder('5  or  5,20  or  1,15  or  */7')
+                        ->helperText('1-31. Comma-separated for multiple days (e.g. "5,20" = 5th AND 20th). Ranges ("5-10") and steps ("*/7") also work.')
+                        ->regex('/^[0-9,\\-\\/\\*]+$/'),
+                    TextInput::make('trigger_config.day_of_week')
+                        ->label('Day(s) of week')
                         ->visible(fn ($get) => $get('trigger_config.schedule_type') === 'weekly')
-                        ->options([1=>'Mon',2=>'Tue',3=>'Wed',4=>'Thu',5=>'Fri',6=>'Sat',7=>'Sun'])
-                        ->default(1)
-                        ->native(false),
+                        ->default('1')
+                        ->placeholder('1  or  1,4  or  1-5')
+                        ->helperText('1=Mon ... 7=Sun. Comma-separated for multiple days (e.g. "1,4" = Mon AND Thu). Ranges ("1-5" = weekdays) also work.')
+                        ->regex('/^[0-9,\\-\\/\\*]+$/'),
                     TextInput::make('trigger_config.cron')
                         ->label('Cron expression')
                         ->visible(fn ($get) => $get('trigger_config.schedule_type') === 'cron')

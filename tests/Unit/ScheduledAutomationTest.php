@@ -129,4 +129,46 @@ class ScheduledAutomationTest extends TestCase
         // execution log row IS created (so user can review what would happen)
         $this->assertSame(1, AutomationRuleExecution::where('rule_id', $rule->id)->count());
     }
+
+    public function test_multi_day_of_month_with_comma(): void
+    {
+        $engine = app(AutomationEngine::class);
+        $rule = \App\Models\AutomationRule::create([
+            'name' => 'biweekly', 'is_enabled' => true, 'trigger_type' => 'scheduled',
+            'trigger_config' => ['schedule_type' => 'monthly', 'day_of_month' => '5,20', 'time' => '08:00', 'target_model' => \App\Models\Customer::class],
+            'actions' => [['type' => 'log_activity', 'description' => 'fired']],
+        ]);
+
+        $this->assertTrue($engine->isScheduledRuleDue($rule,  \Illuminate\Support\Carbon::create(2026, 6,  5, 8, 0)));
+        $this->assertTrue($engine->isScheduledRuleDue($rule,  \Illuminate\Support\Carbon::create(2026, 6, 20, 8, 0)));
+        $this->assertFalse($engine->isScheduledRuleDue($rule, \Illuminate\Support\Carbon::create(2026, 6, 10, 8, 0)));
+        $this->assertFalse($engine->isScheduledRuleDue($rule, \Illuminate\Support\Carbon::create(2026, 6, 20, 9, 0)));
+
+        $this->assertSame('0 8 5,20 * *', $engine->buildCronExpression($rule->trigger_config));
+    }
+
+    public function test_multi_day_of_week_with_comma(): void
+    {
+        $engine = app(AutomationEngine::class);
+        $this->assertSame('0 9 * * 1,4', $engine->buildCronExpression([
+            'schedule_type' => 'weekly', 'day_of_week' => '1,4', 'time' => '09:00',
+        ]));
+    }
+
+    public function test_day_of_month_range_and_step(): void
+    {
+        $engine = app(AutomationEngine::class);
+        $this->assertSame('0 8 1-5 * *',  $engine->buildCronExpression(['schedule_type' => 'monthly', 'day_of_month' => '1-5',  'time' => '08:00']));
+        $this->assertSame('0 8 */7 * *',  $engine->buildCronExpression(['schedule_type' => 'monthly', 'day_of_month' => '*/7',  'time' => '08:00']));
+    }
+
+    public function test_invalid_day_of_month_falls_back_safely(): void
+    {
+        $engine = app(AutomationEngine::class);
+        // injection attempt → falls back to '1', not raw passthrough
+        $this->assertSame('0 8 1 * *', $engine->buildCronExpression([
+            'schedule_type' => 'monthly', 'day_of_month' => "5; DROP TABLE", 'time' => '08:00',
+        ]));
+    }
+
 }
