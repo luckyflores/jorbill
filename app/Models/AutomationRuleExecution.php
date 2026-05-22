@@ -10,7 +10,7 @@ class AutomationRuleExecution extends Model
     use HasFactory;
 
     protected $fillable = [
-        'rule_id', 'fired_at', 'trigger_summary', 'trigger_payload',
+        'rule_id', 'batch_id', 'fired_at', 'trigger_summary', 'trigger_payload',
         'conditions_matched', 'actions_executed', 'duration_ms', 'error',
     ];
 

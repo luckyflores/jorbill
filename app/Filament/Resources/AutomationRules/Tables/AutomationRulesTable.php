@@ -32,7 +32,28 @@ class AutomationRulesTable
             ])
             ->recordActions([
                 ActionGroup::make([
-                    EditAction::make(),
+                    EditAction::make(),                    Action::make('run_now')
+                        ->label('Run now (force)')
+                        ->icon('heroicon-o-bolt')
+                        ->color('warning')
+                        ->visible(fn ($record) => $record->trigger_type === 'scheduled')
+                        ->requiresConfirmation()
+                        ->modalDescription('Forces this scheduled rule to run immediately against all matching records (not dry-run — actions will execute).')
+                        ->action(function ($record) {
+                            $count = app(AutomationEngine::class)->fireScheduledRule($record, dryRun: false);
+                            Notification::make()->title("Processed {$count} record(s)")->success()->send();
+                        }),
+                    Action::make('dry_run_now')
+                        ->label('Dry-run now')
+                        ->icon('heroicon-o-eye')
+                        ->color('gray')
+                        ->visible(fn ($record) => $record->trigger_type === 'scheduled')
+                        ->modalDescription('Runs this scheduled rule against current data in DRY-RUN — no SMS sent, no records changed. Records appear in the audit log as if matched.')
+                        ->action(function ($record) {
+                            $count = app(AutomationEngine::class)->fireScheduledRule($record, dryRun: true, limit: 20);
+                            Notification::make()->title("Dry-ran against up to {$count} record(s)")->body('Check Automation → Rule Executions to see what would have happened.')->info()->persistent()->send();
+                        }),
+
                     Action::make('test_fire')
                         ->label('Test fire')
                         ->icon('heroicon-o-play')

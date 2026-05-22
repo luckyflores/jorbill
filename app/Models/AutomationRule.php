@@ -12,7 +12,7 @@ class AutomationRule extends Model
     protected $fillable = [
         'name', 'description', 'is_enabled',
         'trigger_type', 'trigger_config',
-        'conditions', 'actions',
+        'conditions', 'target_filter', 'actions',
         'last_fired_at', 'fire_count',
     ];
 
@@ -21,6 +21,7 @@ class AutomationRule extends Model
         'trigger_config' => 'array',
         'conditions'     => 'array',
         'actions'        => 'array',
+        'target_filter'  => 'array',
         'last_fired_at'  => 'datetime',
         'fire_count'     => 'integer',
     ];
