@@ -7,4 +7,5 @@ return [
     App\Providers\PaymentServiceProvider::class,
     App\Providers\NotificationServiceProvider::class,
     App\Providers\AutomationServiceProvider::class,
+    App\Providers\OdooServiceProvider::class,
 ];

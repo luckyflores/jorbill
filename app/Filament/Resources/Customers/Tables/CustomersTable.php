@@ -2,6 +2,12 @@
 
 namespace App\Filament\Resources\Customers\Tables;
 
+use Filament\Notifications\Notification;
+
+use Filament\Actions\Action;
+
+use App\Services\Odoo\Contracts\OdooClient;
+
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -71,6 +77,27 @@ class CustomersTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
+                                Action::make('push_to_odoo')
+                    ->label('Push to Odoo')
+                    ->icon('heroicon-o-cloud-arrow-up')
+                    ->color('info')
+                    ->requiresConfirmation()
+                    ->modalDescription('Creates or updates the matching res.partner record in Odoo, using customer_code as the cross-reference. Idempotent.')
+                    ->action(function ($record) {
+                        $odoo = app(OdooClient::class);
+                        $id = $odoo->findOrCreatePartner($record->toArray());
+                        if ($id !== null) {
+                            Notification::make()
+                                ->title('Pushed to Odoo')
+                                ->body('Odoo partner id: ' . $id)
+                                ->success()->send();
+                        } else {
+                            Notification::make()
+                                ->title('Push failed')
+                                ->body('Check Odoo connection settings + logs.')
+                                ->danger()->send();
+                        }
+                    }),
                 EditAction::make(),
             ])
             ->toolbarActions([
