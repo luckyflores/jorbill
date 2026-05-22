@@ -1,0 +1,23 @@
+# Global options
+{
+    email lucky@maltixtech.xyz
+}
+
+# JorBill admin panel
+jorbill.maltixtech.xyz {
+    encode gzip zstd
+    reverse_proxy 127.0.0.1:8000
+}
+
+# Odoo Community 17 — accounting backend
+accounting.maltixtech.xyz {
+    encode gzip zstd
+    @websockets {
+        path /websocket /longpolling/*
+    }
+    reverse_proxy @websockets 127.0.0.1:8072
+    reverse_proxy 127.0.0.1:8069 {
+        header_up X-Forwarded-Proto https
+        header_up X-Real-IP {remote_host}
+    }
+}
