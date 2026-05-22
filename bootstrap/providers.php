@@ -6,4 +6,5 @@ return [
     App\Providers\NetworkServiceProvider::class,
     App\Providers\PaymentServiceProvider::class,
     App\Providers\NotificationServiceProvider::class,
+    App\Providers\AutomationServiceProvider::class,
 ];
