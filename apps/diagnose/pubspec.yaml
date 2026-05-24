@@ -1,0 +1,41 @@
+name: diagnose
+description: FourLeaf / JorBill — tech & customer diagnostic app
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.22.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # HTTP + auth
+  dio: ^5.4.0
+  flutter_secure_storage: ^9.2.2
+
+  # Network/WiFi diagnostics
+  network_info_plus: ^5.0.3
+  wifi_iot: ^0.3.19
+  dart_ping: ^9.0.1
+
+  # Device & permissions
+  permission_handler: ^11.3.1
+  geolocator: ^11.0.0
+  image_picker: ^1.0.7
+  device_info_plus: ^10.1.0
+  package_info_plus: ^8.0.0
+
+  # UX
+  url_launcher: ^6.2.5
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
