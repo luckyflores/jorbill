@@ -8,4 +8,5 @@ return [
     App\Providers\NotificationServiceProvider::class,
     App\Providers\AutomationServiceProvider::class,
     App\Providers\OdooServiceProvider::class,
+    App\Providers\Filament\CustomerPanelProvider::class,
 ];
